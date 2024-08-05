@@ -5,8 +5,12 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.concurrent.EventExecutorGroup;
+import lombok.Getter;
 
 public class EchoServerHandler extends SimpleChannelInboundHandler<Object> {
+
+    @Getter
+    private static String echoedMessage;
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
@@ -18,6 +22,8 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<Object> {
 //        super.channelRead(ctx, msg);
         // 수신된 데이터를 클라이언트로 그대로 전송
         String message = (String) msg;
+
+        echoedMessage = message;
 
         Channel channel = ctx.channel();
         channel.writeAndFlush("[ECHO] " + message + " received\n");
@@ -32,4 +38,5 @@ public class EchoServerHandler extends SimpleChannelInboundHandler<Object> {
         cause.printStackTrace();
         ctx.close();
     }
+
 }
