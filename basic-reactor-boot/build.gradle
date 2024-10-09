@@ -30,7 +30,7 @@ dependencies {
     // Impl
     implementation("io.projectreactor:reactor-core:3.4.0")
     //log - logback
-    implementation("ch.qos.logback:logback-classic:1.2.3")
+//    implementation("ch.qos.logback:logback-classic:1.2.10")
     //reactor-debug-agent
     implementation('io.projectreactor:reactor-tools:3.4.0')
 
