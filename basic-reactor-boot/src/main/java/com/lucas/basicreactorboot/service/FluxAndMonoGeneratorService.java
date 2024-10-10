@@ -3,7 +3,10 @@ package com.lucas.basicreactorboot.service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Function;
 
 /**
  * Flux, Mono Generator Service -> include main() Methods
@@ -23,7 +26,102 @@ public class FluxAndMonoGeneratorService {
             return Mono.just("alex");
         }
 
+        // Flux Operator - map(), filter()
+        public Flux<String> namesFlux_map(int length) {
+            // filtering the String whose length is greater than 3
+            return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                    .map(String::toUpperCase)
+                    .filter(name -> name.length() > length)
+                    .map(s -> s.length() + "-" + s) // 문자열의 길이 + 원래문자열
+                    .log();
+        }
 
+        // Reactive Streams are immutable
+        // 반응형 스트림은 불변이다.
+        public Flux<String> namesFlux_immutable() {
+            var flux = Flux.fromIterable(List.of("alex", "ben", "chloe"));
+
+            // Transforming Flux
+            flux.map(String::toUpperCase); // 원래의 Flux(반응형 스트림)은 불변이기에 변하지 않음.
+
+            return flux;
+        }
+
+        // FlatMap()
+        public Flux<String> namesFlux_flatMap(int length) {
+            // 개별 문자를 반환 -> 각 결과를 char 로 반환함 ALEX, CHLOE -> A, L, E, X, C, H, L, O, E
+            return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                    .map(String::toUpperCase)
+                    .filter(name -> name.length() > length)
+                    .flatMap(s -> splitString(s)) // 각 문자열을 분리하여 반환
+                    .log();
+        }
+
+        public Mono<List<String>> namesMono_flatMap(int length) {
+            return Mono.just("alex")
+                    .map(String::toUpperCase)
+                    .filter(name -> name.length() > length)
+                    .flatMap(this::splitStringMono).log(); // Mono<List Of A,L,E,X>
+        }
+
+
+
+        // FlatMap() - async(비동기): delay 가 걸려있는 method 활용
+        public Flux<String> namesFlux_flatMap_async(int length) {
+            return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                    .map(String::toUpperCase)
+                    .filter(name -> name.length() > length)
+                    .flatMap(s -> splitStringWithDelay(s))
+                    .log();
+        }
+
+
+        public Flux<String> namesFlux_concatMap(int length) {
+            return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                    .map(String::toUpperCase)
+                    .filter(name -> name.length() > length)
+                    .concatMap(s -> splitStringWithDelay(s))
+                    .log();
+        }
+
+        public Flux<String> mono_flatMapMany() {
+            return Mono.just("alex")
+                    .map(String::toUpperCase)
+                    .flatMapMany(this::splitString)
+                    .log();
+        }
+
+        public Flux<String> namesFlux_transform(int length) {
+
+            Function<Flux<String>, Flux<String>> filterMap = name -> name.map(String::toUpperCase)
+                    .filter(s -> s.length() > length);
+
+            return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                    .transform(filterMap)
+                    .flatMap(s -> splitString(s))
+                    .log();
+        }
+
+        // private ------------------------------------------------------------
+        private Flux<String> splitString(String name) {
+            var array = name.split(""); // Each character in the name
+            return Flux.fromArray(array);
+        }
+
+        private Flux<String> splitStringWithDelay(String name) {
+            var array = name.split(""); // Each character in the name
+            var delayTime = new Random().nextInt(1000);
+            return Flux.fromArray(array)
+                    .delayElements(Duration.ofMillis(delayTime));
+        }
+
+        private Mono<List<String>> splitStringMono(String s) {
+            var charArray = s.split("");
+            var list = List.of(charArray); // A,L,E,X
+            return Mono.just(list);
+        }
+
+    // main ------------------------------------------------------------
     public static void main(String[] args) {
         System.out.println("@@@@ FluxAndMonoGeneratorService.main() @@@@");
 
