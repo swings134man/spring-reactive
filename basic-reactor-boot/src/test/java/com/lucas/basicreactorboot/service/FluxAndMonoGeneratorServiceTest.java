@@ -6,6 +6,7 @@ import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -116,6 +117,27 @@ public class FluxAndMonoGeneratorServiceTest {
 
         StepVerifier.create(data)
                 .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
+                .verifyComplete();
+    }
+
+    @Test
+    void fluxTransForm_empty1() {
+        int length = 6;
+
+        var data = generator.namesFlux_transform(length);
+
+        StepVerifier.create(data)
+//                .expectNext("A", "L", "E", "X", "C", "H", "L", "O", "E")
+                .expectNext("default")
+                .verifyComplete();
+    }
+
+    @Test
+    void fluxTransFrom_switchDefault() {
+        int length = 6;
+        var data = generator.namesFlux_transform_switchDefault(length);
+        StepVerifier.create(data)
+                .expectNext("D", "E", "F", "A", "U", "L", "T")
                 .verifyComplete();
     }
 

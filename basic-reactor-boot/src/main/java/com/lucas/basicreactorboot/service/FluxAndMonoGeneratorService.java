@@ -99,6 +99,23 @@ public class FluxAndMonoGeneratorService {
             return Flux.fromIterable(List.of("alex", "ben", "chloe"))
                     .transform(filterMap)
                     .flatMap(s -> splitString(s))
+                    .defaultIfEmpty("default")
+                    .log();
+        }
+
+        public Flux<String> namesFlux_transform_switchDefault(int length) {
+
+            Function<Flux<String>, Flux<String>> filterMap = name ->
+                    name.map(String::toUpperCase)
+                    .filter(s -> s.length() > length)
+                    .flatMap(s -> splitString(s));
+
+            var defaultFlux = Flux.just("default")
+                    .transform(filterMap); // D,E,F,A,U,L,T
+
+            return Flux.fromIterable(List.of("alex", "ben", "chloe"))
+                    .transform(filterMap)
+                    .switchIfEmpty(defaultFlux)
                     .log();
         }
 
