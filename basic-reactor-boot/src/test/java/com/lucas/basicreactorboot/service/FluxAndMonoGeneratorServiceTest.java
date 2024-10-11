@@ -3,6 +3,8 @@ package com.lucas.basicreactorboot.service;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import reactor.util.function.Tuple4;
+import reactor.util.function.Tuple5;
 
 import java.util.Arrays;
 import java.util.List;
@@ -141,6 +143,81 @@ public class FluxAndMonoGeneratorServiceTest {
                 .verifyComplete();
     }
 
+
+    // combine Streams ------------------------------------------------------------
+
+    @Test
+    void concatTest() {
+        var data = generator.combine_concat();
+
+        StepVerifier.create(data)
+                .expectNext("a","b", "c", "d", "e", "f")
+                .verifyComplete();
+    }
+
+    @Test
+    void concatWithTest() {
+        var data = generator.combine_concatWith();
+
+        StepVerifier.create(data)
+                .expectNext("a","b", "c", "d", "e", "f")
+                .verifyComplete();
+    }
+
+    @Test
+    void concatWithMonoTest() {
+        var data = generator.mono_combine_concatWith();
+
+        StepVerifier.create(data)
+                .expectNext("a","b")
+                .verifyComplete();
+    }
+
+    @Test
+    void mergeTest() {
+        var data = generator.combine_merge();
+
+        StepVerifier.create(data)
+                .expectNext("a", "d", "b", "e", "c", "f")
+                .verifyComplete();
+    }
+
+    @Test
+    void mono_mergeWith() {
+        var data = generator.mono_mergeWith();
+
+        StepVerifier.create(data)
+                .expectNext("a", "b")
+                .verifyComplete();
+    }
+
+    @Test
+    void mergeSequentialTest() {
+        var data = generator.combine_mergeSequential();
+
+        StepVerifier.create(data)
+                .expectNext("a","b", "c", "d", "e", "f")
+                .verifyComplete();
+    }
+
+    @Test
+    void zipTest() {
+        var data = generator.combine_zip();
+
+        StepVerifier.create(data)
+                .expectNext("ad", "be", "cf")
+                .verifyComplete();
+    }
+
+    @Test
+    void zipTestMany() {
+        var data = generator.combine_zipMany();
+
+        StepVerifier.create(data)
+                .expectNext("ad14", "be25", "cf36")
+                .verifyComplete();
+    }
+
     @Test
     void flatMapTestSamples() {
 //        Flux<String> userIds = Flux.just("user1", "user2", "user3");
@@ -149,4 +226,6 @@ public class FluxAndMonoGeneratorServiceTest {
 
         // 즉 각 사용자에 대한 데이터를 가져오는 비동기 작업을 수행하고, 각 사용자에 대한 데이터를 반환하는 Flux를 생성함.
     }
+
+
 }

@@ -119,6 +119,91 @@ public class FluxAndMonoGeneratorService {
                     .log();
         }
 
+        // combine Streams ------------------------------------------------------------
+        public Flux<String> combine_concat() {
+            var flux1 = Flux.just("a", "b", "c");
+            var flux2 = Flux.just("d", "e", "f");
+
+            return Flux.concat(flux1, flux2).log();
+        }
+
+        public Flux<String> combine_concatWith() {
+            var flux1 = Flux.just("a", "b", "c");
+            var flux2 = Flux.just("d", "e", "f");
+
+            return flux1.concatWith(flux2).log();
+        }
+
+        // Mono -> Flux
+        public Flux<String> mono_combine_concatWith() {
+            var mono1 = Mono.just("a");
+            var mono2 = Mono.just("b");
+
+            return mono1.concatWith(mono2).log();
+        }
+
+        public Flux<String> combine_merge() {
+            var flux1 = Flux.just("a", "b", "c").delayElements(Duration.ofMillis(100));
+            var flux2 = Flux.just("d", "e", "f").delayElements(Duration.ofMillis(125));
+
+            return Flux.merge(flux1, flux2).log();
+        }
+
+        public Flux<String> combine_mergeWith() {
+            var flux1 = Flux.just("a", "b", "c").delayElements(Duration.ofMillis(100));
+            var flux2 = Flux.just("d", "e", "f").delayElements(Duration.ofMillis(125));
+
+            return flux1.mergeWith(flux2).log();
+        }
+
+        public Flux<String> mono_mergeWith() {
+            var mono1 = Mono.just("a");
+            var mono2 = Mono.just("b");
+
+            return mono1.mergeWith(mono2).log();
+        }
+
+        public Flux<String> combine_mergeSequential() {
+            var flux1 = Flux.just("a", "b", "c").delayElements(Duration.ofMillis(100));
+            var flux2 = Flux.just("d", "e", "f").delayElements(Duration.ofMillis(125));
+
+            return Flux.mergeSequential(flux1, flux2).log();
+        }
+
+        public Flux<String> combine_zip() {
+            var flux1 = Flux.just("a", "b", "c");
+            var flux2 = Flux.just("d", "e", "f");
+
+            return Flux.zip(flux1, flux2, (t1, t2) -> t1 + t2).log(); // ad, be, cf
+        }
+
+        public Flux<String> combine_zipMany() {
+            var flux1 = Flux.just("a", "b", "c");
+            var flux2 = Flux.just("d", "e", "f");
+            var flux3 = Flux.just("1", "2", "3");
+            var flux4 = Flux.just("4", "5", "6");
+
+            return Flux.zip(flux1, flux2, flux3, flux4)
+                    .map(t -> t.getT1() + t.getT2() + t.getT3() + t.getT4()).log();
+        }
+
+        public Flux<String> combine_zipWith() {
+            var flux1 = Flux.just("a", "b", "c");
+            var flux2 = Flux.just("d", "e", "f");
+
+            return flux1.zipWith(flux2, (t1, t2) -> t1 + t2).log();
+        }
+
+        // Mono -> Mono (zipWith)
+        public Mono<String> mono_zipWith() {
+            var mono1 = Mono.just("a");
+            var mono2 = Mono.just("b");
+
+            return mono1.zipWith(mono2)
+                    .map(t2 -> t2.getT1() + t2.getT2())
+                    .log();
+        }
+
         // private ------------------------------------------------------------
         private Flux<String> splitString(String name) {
             var array = name.split(""); // Each character in the name
