@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  data:
+    mongodb:
+      uri: mongodb://test1:test1234@192.168.35.135:17017/test?authSource=admin&authMechanism=SCRAM-SHA-1 #FIXME
+      database: test #FIXME
