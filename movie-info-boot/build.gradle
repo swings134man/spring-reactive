@@ -40,3 +40,12 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// 기본 폴더 구조 재정의: 유닛테스트, 통합테스트용
+sourceSets {
+	test {
+		java {
+			srcDirs 'src/test/java/unit', 'src/test/java/intg' // 유닛, 통합
+		}
+	}
+}
