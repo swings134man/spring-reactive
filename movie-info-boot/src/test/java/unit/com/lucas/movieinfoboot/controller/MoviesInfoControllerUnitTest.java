@@ -144,4 +144,30 @@ public class MoviesInfoControllerUnitTest {
                 .exchange()
                 .expectStatus().isNoContent();
     }
+
+    // ------------------------------------------------------
+    @Test
+    @DisplayName("Save MovieInfo - With Validation")
+    void addMovieInfoForValidation() {
+        // name Must not be blank, year Must be positive value
+        var entity = new MovieInfo(null, "",
+                -2005, List.of(""), LocalDate.parse("2005-06-15"));
+
+        webTestClient.post()
+                .uri(MOVIES_INFO_URL)
+                .bodyValue(entity)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult -> {
+                    var responseBody = stringEntityExchangeResult.getResponseBody();
+                    System.out.println("responseBody = " + responseBody);
+
+                    var expectedError = "movieInfo.cast must be present, movieInfo.name must be not blank, movieInfo.year must be positive value";
+
+                    assert responseBody != null;
+                    assertEquals(expectedError, responseBody);
+                });
+    }
 }

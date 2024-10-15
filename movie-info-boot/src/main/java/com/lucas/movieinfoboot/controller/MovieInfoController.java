@@ -2,6 +2,7 @@ package com.lucas.movieinfoboot.controller;
 
 import com.lucas.movieinfoboot.domain.MovieInfo;
 import com.lucas.movieinfoboot.service.MovieInfoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class MovieInfoController {
 
     @PostMapping("/movieInfos")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<MovieInfo> addMovieInfo(@RequestBody MovieInfo movieInfo) {
+    public Mono<MovieInfo> addMovieInfo(@RequestBody @Valid MovieInfo movieInfo) {
         return movieInfoService.addMovieInfo(movieInfo).log();
     }
 
