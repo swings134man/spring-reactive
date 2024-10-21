@@ -4,6 +4,7 @@ import com.lucas.movieinfoboot.domain.MovieInfo;
 import com.lucas.movieinfoboot.service.MovieInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Slf4j
 public class MovieInfoController {
 
     private final MovieInfoService movieInfoService;
@@ -24,7 +26,13 @@ public class MovieInfoController {
     }
 
     @GetMapping("/movieInfos")
-    public Flux<MovieInfo> getAllMovieInfos() {
+    public Flux<MovieInfo> getAllMovieInfos(@RequestParam(required = false, value = "year") Integer year) {
+        log.info("year = {}", year);
+
+        if(null != year){
+            return movieInfoService.getMovieInfoByYear(year).log();
+        }
+
         return movieInfoService.getAllMovieInfos().log();
     }
 

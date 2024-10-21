@@ -89,7 +89,7 @@ class MovieInfoRepositoryIntgTest {
     }
 
     @Test
-    @DisplayName("3. update - updateMovieInfo")
+    @DisplayName("4. update - updateMovieInfo")
     void updateMovieInfo() {
         var entity = movieInfoRepository.findById("abc").block(); // block() : 데이터가 조회될때까지 대기 TestCase 에서만 사용
         entity.setYear(2029);
@@ -106,7 +106,7 @@ class MovieInfoRepositoryIntgTest {
     }
 
     @Test
-    @DisplayName("1. delete")
+    @DisplayName("5. delete")
     void deleteMovieInfo() {
         // when
         movieInfoRepository.deleteById("abc").block();
@@ -116,6 +116,25 @@ class MovieInfoRepositoryIntgTest {
         // then
         StepVerifier.create(movieInfoFlux)
                 .expectNextCount(2)
+                .verifyComplete();
+    }
+
+    @Test
+    void findByYear() {
+
+        var result = movieInfoRepository.findByYear(2005).log();
+
+        StepVerifier.create(result)
+                .expectNextCount(1)
+                .verifyComplete();
+    }
+
+    @Test
+    void findByName() {
+        var result = movieInfoRepository.findByName("Batman Begins").log();
+
+        StepVerifier.create(result)
+                .expectNextCount(1)
                 .verifyComplete();
     }
 }

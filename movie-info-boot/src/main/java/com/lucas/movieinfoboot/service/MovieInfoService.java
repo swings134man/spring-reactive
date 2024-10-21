@@ -3,6 +3,7 @@ package com.lucas.movieinfoboot.service;
 import com.lucas.movieinfoboot.domain.MovieInfo;
 import com.lucas.movieinfoboot.repository.MovieInfoRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogBuilder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -41,5 +42,13 @@ public class MovieInfoService {
 
     public Mono<Void> deletedMovieInfo(String id) {
         return movieInfoRepository.deleteById(id);
+    }
+
+    public Flux<MovieInfo> getMovieInfoByYear(Integer year) {
+        return movieInfoRepository.findByYear(year);
+    }
+
+    public Mono<MovieInfo> getMovieInfoByName(String name) {
+        return movieInfoRepository.findByName(name);
     }
 }
