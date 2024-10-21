@@ -135,4 +135,34 @@ class MovieInfoControllerIntgTest {
                 .exchange()
                 .expectStatus().isNoContent();
     }
+
+
+    @Test
+    @DisplayName("영화 정보 수정 - Not Found")
+    void updateMovieInfo_notFound() {
+
+        var movieInfoId = "def";
+        var entity = new MovieInfo(null, "Dark knight Rises1",
+                2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient.put()
+                .uri(MOVIES_INFO_URL+"/{id}", movieInfoId)
+                .bodyValue(entity)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    @DisplayName("영화 정보 조회 단건 - Not Found")
+    void getMovieById_notFound() {
+
+        var movieInfoId = "def";
+
+        webTestClient.get()
+                .uri(MOVIES_INFO_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
 }
