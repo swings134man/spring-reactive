@@ -1,5 +1,8 @@
 package com.lucas.moviemainboot.controller;
 
+import com.lucas.moviemainboot.client.MoviesInfoRestClient;
+import com.lucas.moviemainboot.client.ReviewRestClient;
+import com.lucas.moviemainboot.entity.Movie;
 import com.lucas.moviemainboot.entity.MovieInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +18,20 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/movies")
 public class MoviesController {
 
+    private final MoviesInfoRestClient moviesInfoRestClient;
+    private final ReviewRestClient reviewRestClient;
+
     /**
      * 영화 1개에 대한 정보,리뷰 조회
      */
     @GetMapping("/{id}")
-    public Mono<MovieInfo> retrieveMovieById(@PathVariable String movieId) {
+    public Mono<Movie> retrieveMovieById(@PathVariable("id") String movieId) {
 
-        return null;
+        return moviesInfoRestClient.retrieveMovieInfo(movieId)
+                        .flatMap(movieInfo -> {
+                            var reviewsListMono = reviewRestClient.retrieveReviews(movieId)
+                                                    .collectList();
+                            return reviewsListMono.map(reviews -> new Movie(movieInfo, reviews));
+                        });
     }
 }
