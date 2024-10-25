@@ -1,6 +1,7 @@
 package com.lucas.moviereviewboot.router;
 
 import com.lucas.moviereviewboot.domain.Review;
+import com.lucas.moviereviewboot.exceptionHandler.GlobalErrorHandler;
 import com.lucas.moviereviewboot.handler.ReviewHandler;
 import com.lucas.moviereviewboot.repository.ReviewReactiveRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Review Router Unit Test
  */
 @WebFluxTest
-@ContextConfiguration(classes = {ReviewRouter.class, ReviewHandler.class}) // Bean 주입
+@ContextConfiguration(classes = {ReviewRouter.class, ReviewHandler.class, GlobalErrorHandler.class}) // Bean 주입
 @AutoConfigureWebTestClient
 class ReviewUnitTest {
 
@@ -57,6 +58,25 @@ class ReviewUnitTest {
                     assert review != null;
                     assertNotNull(review.getReviewId());
                 });
+    }
+
+    @Test
+    @DisplayName("리뷰 추가 Exception")
+    void addReview_exception() {
+        var data = new Review(null, null, "Awesome Movie", -9.0);
+
+        when(repository.save(isA(Review.class)))
+                .thenReturn(Mono.just(new Review( "abc", 1L, "Awesome Movie", 9.0)));
+
+        webTestClient
+                .post()
+                .uri(REVIEWS_INFO_URL)
+                .bodyValue(data)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .isEqualTo("rating.movieInfoId: must not ne null,rating.negative : rating is negative and please pass a non-negative value");
     }
 
     @Test
@@ -104,6 +124,25 @@ class ReviewUnitTest {
                     assertEquals(9.1, result.getRating());
                     assertEquals("Awesome Movie", result.getComment());
                 });
+    }
+
+    @Test
+    @DisplayName("리뷰 수정 - Exception")
+    void updateReview_exception() {
+        var entity = new Review(null, 1L, "Awesome Movie", 9.1);
+
+        // 수정된 Entity Data
+        when(repository.save(isA(Review.class))).thenReturn(Mono.just(new Review("abc", 1L, "Awesome Movie", 9.1)));
+        // 기존 Entity Data
+        when(repository.findById((String) any())).thenReturn(Mono.empty());
+
+        webTestClient.put()
+                .uri(REVIEWS_INFO_URL + "/{id}", "bbb")
+                .bodyValue(entity)
+                .exchange()
+                .expectStatus().isNotFound();
+//                .expectBody(String.class)
+//                .isEqualTo("Review Not Found for the given Review id bbb");
     }
 
     @Test
