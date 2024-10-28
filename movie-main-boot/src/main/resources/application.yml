@@ -1,6 +1,10 @@
 server:
   port: 8082
 
+spring:
+  profiles:
+    active: local
+
 restClient:
   moviesInfoUrl: http://localhost:8080/api/movieInfos
   reviewUrl: http://localhost:8081/api/reviews
