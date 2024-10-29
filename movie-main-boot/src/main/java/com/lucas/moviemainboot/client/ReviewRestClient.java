@@ -5,6 +5,7 @@ import com.lucas.moviemainboot.exception.MoviesInfoClientException;
 import com.lucas.moviemainboot.exception.MoviesInfoServerException;
 import com.lucas.moviemainboot.exception.ReviewsClientException;
 import com.lucas.moviemainboot.exception.ReviewsServerException;
+import com.lucas.moviemainboot.utils.RetryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +56,7 @@ public class ReviewRestClient {
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(response -> Mono.error(new ReviewsServerException("Review Server Error: " + response)));
                 })
-                .bodyToFlux(Review.class);
+                .bodyToFlux(Review.class)
+                .retryWhen(RetryUtil.retrySpec());
     }
 }

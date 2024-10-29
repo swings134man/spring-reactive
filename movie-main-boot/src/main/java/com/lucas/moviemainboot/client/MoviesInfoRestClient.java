@@ -3,6 +3,7 @@ package com.lucas.moviemainboot.client;
 import com.lucas.moviemainboot.entity.MovieInfo;
 import com.lucas.moviemainboot.exception.MoviesInfoClientException;
 import com.lucas.moviemainboot.exception.MoviesInfoServerException;
+import com.lucas.moviemainboot.utils.RetryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 /**
  * movies-info Module 과의 Rest 통신을 위한 WebClient 설정
@@ -26,6 +31,15 @@ public class MoviesInfoRestClient {
     private String moviesInfoUrl;
 
     public Mono<MovieInfo> retrieveMovieInfo(String movieId) {
+        // Util 로 분리
+//        var retrySpec = Retry.fixedDelay(3, Duration.ofSeconds(1))
+//                .filter(ex -> ex instanceof MoviesInfoServerException) // MoviesInfoServerException 발생 시 재시도, 다른 Exception 이라면 재시도 X
+//                .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+//                        // 예외확산: 재시도를 위한 신호 전달
+//                        // 재시도 예외 메세지를 출력하는 대신, 예외를 야기한 실제 이슈에 엑세스권한부여(즉 원래 예외 출력)
+//                        Exceptions.propagate(retrySignal.failure())
+//                );
+
         var url = moviesInfoUrl.concat("/{id}");
 
         return webClient.get()
@@ -50,6 +64,9 @@ public class MoviesInfoRestClient {
                             .flatMap(response -> Mono.error(new MoviesInfoServerException("MoviesInfo Server Error: " + response)));
                 })
                 .bodyToMono(MovieInfo.class)
+//                .retry(3) // 3번까지 재시도 총 4번 요청
+//                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))) // 3초 간격으로 3번 재시도: 기존의 Server Error Msg 가 변경됨
+                .retryWhen(RetryUtil.retrySpec())
                 .log();
     }
 }

@@ -1,5 +1,6 @@
 package com.lucas.moviemainboot.controller;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.lucas.moviemainboot.entity.Movie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,6 +81,9 @@ class MoviesControllerIntgTest {
                 .is4xxClientError()
                 .expectBody(String.class)
                 .isEqualTo("MovieInfo Not Found by MoviesId: abc");
+
+        // 404 예외는 처리하지 않고, 5xx 에러 일때만 처리하기 위함
+        WireMock.verify(1, getRequestedFor(urlEqualTo("/api/movieInfos/" + movieId)));
     }
 
     @Test
@@ -125,6 +129,34 @@ class MoviesControllerIntgTest {
                 .is5xxServerError()
                 .expectBody(String.class)
                 .isEqualTo("MoviesInfo Server Error: MovieInfo Service Unavailable");
+
+        WireMock.verify(4, getRequestedFor(urlEqualTo("/api/movieInfos/" + movieId)));
+    }
+
+    @Test
+    @DisplayName("Retrieve Movie By ID: (reviews)5xx Error")
+    void retrieveMovieById_5xx_reviews() {
+        var movieId = "abc";
+        stubFor(get(urlEqualTo("/api/movieInfos/" + movieId))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("movieinfo.json")));
+
+        // Exception Make
+        stubFor(get(urlPathEqualTo("/api/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                        .withBody("Review Service Unavailable")));
+
+        webTestClient.get()
+                .uri("/api/movies/{id}", movieId)
+                .exchange()
+                .expectStatus()
+                .is5xxServerError()
+                .expectBody(String.class)
+                .isEqualTo("Review Server Error: Review Service Unavailable");
+
+        WireMock.verify(4, getRequestedFor(urlPathMatching("/api/reviews*")));
     }
 
 }//class
