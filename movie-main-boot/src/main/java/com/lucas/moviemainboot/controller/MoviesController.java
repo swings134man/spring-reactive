@@ -3,13 +3,9 @@ package com.lucas.moviemainboot.controller;
 import com.lucas.moviemainboot.client.MoviesInfoRestClient;
 import com.lucas.moviemainboot.client.ReviewRestClient;
 import com.lucas.moviemainboot.entity.Movie;
-import com.lucas.moviemainboot.entity.MovieInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -33,5 +29,12 @@ public class MoviesController {
                                                     .collectList();
                             return reviewsListMono.map(reviews -> new Movie(movieInfo, reviews));
                         });
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public Mono<Void> deleteMovieInfoById(@PathVariable("id") String movieId) {
+        return moviesInfoRestClient.deleteInfoById(movieId)
+                .log();
     }
 }

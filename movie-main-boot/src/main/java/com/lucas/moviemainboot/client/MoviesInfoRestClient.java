@@ -11,11 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
-
-import java.time.Duration;
 
 /**
  * movies-info Module 과의 Rest 통신을 위한 WebClient 설정
@@ -68,5 +64,31 @@ public class MoviesInfoRestClient {
 //                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))) // 3초 간격으로 3번 재시도: 기존의 Server Error Msg 가 변경됨
                 .retryWhen(RetryUtil.retrySpec())
                 .log();
+    }
+
+
+    public Mono<Void> deleteInfoById(String movieId) {
+        return webClient.delete()
+                .uri(moviesInfoUrl.concat("/{id}"), movieId)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    log.info("status code: {}", clientResponse.statusCode());
+
+                    if(clientResponse.statusCode().equals(HttpStatus.NOT_FOUND)) {
+                        return Mono.error(new MoviesInfoClientException("MovieInfo Not Found By movieId: " + movieId, clientResponse.statusCode().value()));
+                    }
+
+                    // 4xx 에러여야 하는데 200 으로 떨어짐?
+//                    return clientResponse.bodyToMono(String.class)
+//                            .flatMap(response -> Mono.error(new MoviesInfoClientException(response, clientResponse.statusCode().value())));
+                    return Mono.error(new MoviesInfoClientException("MovieInfo Client Error", clientResponse.statusCode().value()));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+                    log.info("status code: {}", clientResponse.statusCode());
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(response -> Mono.error(new MoviesInfoServerException("movieInfo Server Error: " + response)));
+                })
+                .bodyToMono(Void.class);
+
     }
 }

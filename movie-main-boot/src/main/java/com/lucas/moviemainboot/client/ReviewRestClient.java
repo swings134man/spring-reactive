@@ -59,4 +59,8 @@ public class ReviewRestClient {
                 .bodyToFlux(Review.class)
                 .retryWhen(RetryUtil.retrySpec());
     }
+
+    public void deleteReviesById(String id) {
+        
+    }
 }
