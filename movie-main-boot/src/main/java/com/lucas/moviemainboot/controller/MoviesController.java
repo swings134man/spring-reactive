@@ -5,6 +5,7 @@ import com.lucas.moviemainboot.client.ReviewRestClient;
 import com.lucas.moviemainboot.entity.Movie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -33,8 +34,11 @@ public class MoviesController {
 
     // DELETE
     @DeleteMapping("/{id}")
-    public Mono<Void> deleteMovieInfoById(@PathVariable("id") String movieId) {
+    public Mono<ResponseEntity<Void>> deleteMovieInfoById(@PathVariable("id") String movieId) {
         return moviesInfoRestClient.deleteInfoById(movieId)
-                .log();
+                .then(reviewRestClient.deleteReviewsById(movieId))
+                .then(Mono.just(ResponseEntity.noContent().build()))
+                ;
     }
+
 }

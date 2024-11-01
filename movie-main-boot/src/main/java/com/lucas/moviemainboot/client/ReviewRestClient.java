@@ -60,7 +60,33 @@ public class ReviewRestClient {
                 .retryWhen(RetryUtil.retrySpec());
     }
 
-    public void deleteReviesById(String id) {
-        
+    public Mono<Void> deleteReviewsById(String id) {
+        var uri = UriComponentsBuilder
+                .fromHttpUrl(reviewUrl)
+                .queryParam("movieInfoId", id)
+                .buildAndExpand().toUriString();
+
+        return webClient.delete()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    log.info("status code: {}", clientResponse.statusCode());
+
+                    // Not Found(404) - 특정 ID 를 찾지못할경우 info Module 에서 404 기때문에 해당 서버에서는 처리 X
+                    if (clientResponse.statusCode().equals(HttpStatus.NOT_FOUND)) {
+                        return Mono.empty();
+                    }
+
+                    // 404 가 아닌 4xx 일 경우
+                    return Mono.error(new MoviesInfoClientException("Reviews Client Error", clientResponse.statusCode().value()));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+                    log.info("status code: {}", clientResponse.statusCode());
+
+//                    return clientResponse.bodyToMono(String.class)
+//                            .flatMap(response -> Mono.error(new ReviewsServerException("Review Server Error: " + response)));
+                    return Mono.error(new ReviewsServerException("Review Server Error: " + clientResponse.statusCode().value()));
+                })
+                .bodyToMono(Void.class);
     }
 }

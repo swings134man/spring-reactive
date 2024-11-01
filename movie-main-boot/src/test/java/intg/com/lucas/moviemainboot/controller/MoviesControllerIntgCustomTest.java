@@ -29,6 +29,28 @@ class MoviesControllerIntgCustomTest {
     WebTestClient webTestClient;
 
     @Test
+    @DisplayName("delete - movieInfo: 204")
+    void deleteByMovieId() {
+        var movieId = "abc";
+        stubFor(delete(urlEqualTo("/api/movieInfos/" + movieId))
+                .willReturn(aResponse()
+                        .withStatus(204)
+                )
+        );
+
+        stubFor(delete(urlPathEqualTo("/api/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(204)
+                )
+        );
+
+        webTestClient.delete()
+                .uri("/api/movies/{id}", movieId)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
     @DisplayName("delete - movieInfo: Not Found")
     void deleteMovieById_notFound() {
         var movieId = "abc";
@@ -75,5 +97,52 @@ class MoviesControllerIntgCustomTest {
                 .expectStatus().is5xxServerError()
                 .expectBody(String.class)
                 .isEqualTo("movieInfo Server Error: MovieInfo Service Unavailable");
+    }
+
+    // -------------------- Review Delete
+    // reviews -- delete
+    @Test
+    @DisplayName("delete - reviews: 4xx")
+    void deleteReviewById_4xx() {
+        var movieId = "abc";
+        stubFor(delete(urlEqualTo("/api/movieInfos/" + movieId))
+                .willReturn(aResponse()
+                        .withStatus(204)
+                )
+        );
+
+        stubFor(delete(urlPathEqualTo("/api/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(400)
+                )
+        );
+
+        webTestClient.delete()
+                .uri("/api/movies/{id}", movieId)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody(String.class);
+    }
+
+    @Test
+    @DisplayName("delete - reviews: 5xx")
+    void deleteReviewById_5xx() {
+        var movieId = "abc";
+        stubFor(delete(urlEqualTo("/api/movieInfos/" + movieId))
+                .willReturn(aResponse()
+                        .withStatus(204)
+                )
+        );
+
+        stubFor(delete(urlPathEqualTo("/api/reviews"))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                )
+        );
+
+        webTestClient.delete()
+                .uri("/api/movies/{id}", movieId)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 }
