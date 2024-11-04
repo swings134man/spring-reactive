@@ -42,4 +42,5 @@ curl -i -X DELETE http://localhost:8082/api/movieInfos/1
 
 STREAM-MOVIE-INFO
 -----------------------
-curl -i http://localhost:8082/api/movieInfos/stream
+curl -i http://localhost:8082/api/movies/stream/reviews
+curl -i http://localhost:8082/api/movies/stream

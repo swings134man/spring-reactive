@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -181,5 +182,39 @@ class MovieInfoControllerIntgTest {
                 .exchange()
                 .expectStatus()
                 .isNotFound();
+    }
+    // --------------------------------- Stream ---------------------------------------------
+    @Test
+    @DisplayName("모든 영화 정보 조회: Stream")
+    void getAllMovies_stream() {
+        var entity = new MovieInfo(null, "Batman Begins1",
+                2005, List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        webTestClient.post()
+                .uri(MOVIES_INFO_URL)
+                .bodyValue(entity)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var saveMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assert  saveMovieInfo != null;
+                    assert  saveMovieInfo.getMovieInfoId() != null;
+                });
+
+
+        var moviesStreamFlux = webTestClient.get()
+                .uri(MOVIES_INFO_URL + "/stream")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(MovieInfo.class)
+                .getResponseBody();
+
+        StepVerifier.create(moviesStreamFlux)
+                .assertNext(movieInfo -> {
+                    assert movieInfo.getMovieInfoId() != null;
+                })
+                .thenCancel() // Stream Test 경우 무한대기를 방지하기 위해 종료
+                .verify();
     }
 }

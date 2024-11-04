@@ -3,10 +3,14 @@ package com.lucas.moviemainboot.controller;
 import com.lucas.moviemainboot.client.MoviesInfoRestClient;
 import com.lucas.moviemainboot.client.ReviewRestClient;
 import com.lucas.moviemainboot.entity.Movie;
+import com.lucas.moviemainboot.entity.MovieInfo;
+import com.lucas.moviemainboot.entity.Review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -30,6 +34,18 @@ public class MoviesController {
                                                     .collectList();
                             return reviewsListMono.map(reviews -> new Movie(movieInfo, reviews));
                         });
+    }
+
+    // SSE: Stream MovieInfo
+    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<MovieInfo> retrieveMovieInfos() {
+        return moviesInfoRestClient.retrieveMovieInfoStream();
+    }
+
+    // SSE: Stream Review
+    @GetMapping(value = "/stream/reviews", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<Review> retrieveReviewsStream() {
+        return reviewRestClient.retrieveReviewsStream();
     }
 
     // DELETE

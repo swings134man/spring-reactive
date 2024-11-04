@@ -2,7 +2,6 @@ package com.lucas.moviemainboot.client;
 
 import com.lucas.moviemainboot.entity.Review;
 import com.lucas.moviemainboot.exception.MoviesInfoClientException;
-import com.lucas.moviemainboot.exception.MoviesInfoServerException;
 import com.lucas.moviemainboot.exception.ReviewsClientException;
 import com.lucas.moviemainboot.exception.ReviewsServerException;
 import com.lucas.moviemainboot.utils.RetryUtil;
@@ -88,5 +87,30 @@ public class ReviewRestClient {
                     return Mono.error(new ReviewsServerException("Review Server Error: " + clientResponse.statusCode().value()));
                 })
                 .bodyToMono(Void.class);
+    }
+
+    /**
+     * SSE Stream: Reviews
+     * @return
+     */
+    public Flux<Review> retrieveReviewsStream() {
+        var uri = reviewUrl.concat("/stream");
+        return webClient.get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    log.info("status code: {}", clientResponse.statusCode());
+
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(response -> Mono.error(new ReviewsClientException(response)));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+                    log.info("status code: {}", clientResponse.statusCode());
+
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(response -> Mono.error(new ReviewsServerException("Review Server Error: " + response)));
+                })
+                .bodyToFlux(Review.class)
+                .retryWhen(RetryUtil.retrySpec());
     }
 }

@@ -6,10 +6,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,13 +21,18 @@ public class MovieInfoController {
 
     private final MovieInfoService movieInfoService;
 
+    // SSE
+    Sinks.Many<MovieInfo> moviesInfoSink = Sinks.many().replay().all(); //flux -> use all() instead latest(): 최신데이터만 (새로운 구독자는 이전데이터는 X)
+
     @PostMapping("/movieInfos")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<MovieInfo> addMovieInfo(@RequestBody @Valid MovieInfo movieInfo) {
-        return movieInfoService.addMovieInfo(movieInfo).log();
+        return movieInfoService.addMovieInfo(movieInfo)
+                .doOnNext(savedInfo -> moviesInfoSink.tryEmitNext(savedInfo));
 
         // publish that movie to something -> If ADDed
         // Subscriber to This movie info
+        // Subscriber is getMovieInfoStream()
     }
 
     @GetMapping("/movieInfos")
@@ -45,6 +52,12 @@ public class MovieInfoController {
                 .map(ResponseEntity.ok()::body)
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
                 .log();
+    }
+
+    // NDJSON_VALUE: Json 을 event Stream send
+    @GetMapping(value = "/movieInfos/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<MovieInfo> getMovieInfoStream() {
+        return moviesInfoSink.asFlux().log();
     }
 
     @PutMapping("/movieInfos/{id}")
