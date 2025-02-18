@@ -4,6 +4,8 @@ CREATE TABLE post (
                       title VARCHAR(255) NOT NULL,
                       content TEXT NOT NULL,
                       author_id BIGINT NOT NULL,
+                      created_by VARCHAR(125),
+                      updated_by VARCHAR(125),
                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
