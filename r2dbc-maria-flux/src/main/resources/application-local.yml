@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  # DB Configuration
+  r2dbc:
+    url: r2dbc:mariadb://192.168.45.135:3360/rtdbc
+    username: test
+    password: test12!@
+  sql:
+    init:
+      mode: always # always, never, embedded, embedded-never
