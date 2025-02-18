@@ -49,3 +49,26 @@ public class SampleCustomRepository {
     }
 }
 ```
+
+### R2DBC 에서의 @Transactional 
+- R2DBC 는 Non-Blocking 환경에서 `Transaction` 을 관리해야 한다.
+  - 다만 기존의 Transaction 의 경우 ThreadLocal 을 사용하여 Transaction 을 관리하는데, ThreadLocal 은 Single Thread 에서만 사용가능하다. 즉 (Blocking 환경이고 JPA 는 이를 차용한다)
+- Spring 의 Reactive Transaction 지원 기능을 사용하여 `@Transaction` 을 사용할 수 있다.
+  - 다만 이 경우 `@Transaction` 의 Method Return type 은 `Mono`, `Flux` 이어야 한다.
+- 수동으로 `Transaction` 을 관리 할 수 있다
+```java
+
+// 1. 수동 Transaction 관리
+@Service
+@RequiredArgsConstructor
+public class SampleService {
+    
+    private final SampleRepository repository;
+    private final TransactionOperator operator;
+    
+    // 이외에 다른 방법들이 더 존재함.
+    public Flux<Sample> saveSample(Sample sample){
+        return operator.transactional(repository.save(sample));
+    }
+}
+```

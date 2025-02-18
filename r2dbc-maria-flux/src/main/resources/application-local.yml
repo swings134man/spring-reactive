@@ -11,3 +11,9 @@ spring:
   sql:
     init:
       mode: always # always, never, embedded, embedded-never
+
+
+# Logging - For SQL Query
+logging:
+  level:
+    org.springframework.data.r2dbc: DEBUG
