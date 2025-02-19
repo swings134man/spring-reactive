@@ -51,4 +51,15 @@ public class PostService {
     public Mono<Post> findByPostId(Long id) {
         return postRepository.findById(id);
     }
+
+    // ---------------------------------------- Custom Query ----------------------------------------
+    @Transactional(readOnly = true)
+    public Flux<Post> findByPostLimit(int limit) {
+        return postRepository.findByPostLimit(limit);
+    }
+
+    @Transactional(readOnly = true)
+    public Flux<Post> findPostByIdRange(Long start, Long end) {
+        return postRepository.findPostByIdRange(start, end);
+    }
 }

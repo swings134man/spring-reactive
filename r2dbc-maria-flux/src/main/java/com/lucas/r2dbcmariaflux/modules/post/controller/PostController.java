@@ -38,4 +38,19 @@ public class PostController {
                 .collectList()
                 .map(ResponseEntity::ok);
     }
+
+    // ---------------------------------------- Custom Query ----------------------------------------
+    @GetMapping("/limit/{limit}")
+    public Mono<ResponseEntity<List<Post>>> findPostLimit(@PathVariable("limit") int limit) {
+        return service.findByPostLimit(limit)
+                .collectList()
+                .map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/range/{start}/{end}")
+    public Mono<ResponseEntity<List<Post>>> findPostByIdRange(@PathVariable Long start, @PathVariable Long end) {
+        return service.findPostByIdRange(start, end)
+                .collectList()
+                .map(ResponseEntity::ok);
+    }
 }
