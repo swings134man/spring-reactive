@@ -50,6 +50,8 @@ public class SampleCustomRepository {
 }
 ```
 
+---
+
 ### R2DBC 에서의 @Transactional 
 - R2DBC 는 Non-Blocking 환경에서 `Transaction` 을 관리해야 한다.
   - 다만 기존의 Transaction 의 경우 ThreadLocal 을 사용하여 Transaction 을 관리하는데, ThreadLocal 은 Single Thread 에서만 사용가능하다. 즉 (Blocking 환경이고 JPA 는 이를 차용한다)
@@ -72,3 +74,18 @@ public class SampleService {
     }
 }
 ```
+
+---
+
+### R2DBC 연관관계 
+- R2DBC 는 JPA 처럼 연관관계를 자동으로 처리해주지 않는다.
+- 따라서 `@Transient` 어노테이션을 사용하여 연관관계를 직접 구현해야 한다.
+  - `@Transient` 는 DB 에 저장되지 않는 필드를 지정할때 사용한다.
+  - `@Transient` 를 사용하여 연관관계를 구현하면, `@Query` 를 통해 직접 쿼리를 작성할때, 연관관계를 사용할 수 있다.
+- 즉, `JOIN` 이나, `A` 테이블 조회후 연관된 `B` 테이블을 조회후 Mapping 하는 방법들을 사용해야 한다.
+- 이때 Custom 한 Converter 나, Mapper 등을 구현하여 사용하는 방법도 존재한다. 
+  - 단점은 연관관계가 많아지면 그만큼 Class 가 복잡해지고 수가 많아지게된다..
+  - (Reading, Writer Converter Annotation) 을 사용하여 R2DbcCustomConversion 에 등록하여 사용하는 방법도 있다. 
+- 주의점
+  - 1:N 연관관계일때 Result 가 파편화 되어있을 수 있다.(하나의 list 로 묶이지 않는)
+  - 이때 `.bufferedUntilChanged()` 로 동등비교 후 하나로 묶어 return 하면 된다.

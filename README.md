@@ -17,3 +17,8 @@ GitHub Repo Renamed at 2024-10-07 [netty -> spring-reactive]
 4. movie-review-boot(MSA): WebFlux Test module(영화 평가, 등급 정보)
    - mongoDB
    - Functional Endpoints (WebFlux)
+5. r2dbc-maria-flux: Webflux + R2DBC + MariaDB 연동 모듈(Reactive Connection)
+   - MariaDB
+   - R2DBC
+   - Annotated Controller (WebFlux)
+   - Redis Connection(예정)
