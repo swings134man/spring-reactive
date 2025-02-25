@@ -21,4 +21,6 @@ GitHub Repo Renamed at 2024-10-07 [netty -> spring-reactive]
    - MariaDB
    - R2DBC
    - Annotated Controller (WebFlux)
-   - Redis Connection(예정)
+6. redis-webflux Webflux 에서 Reactive Redis 연동 모듈
+   - Reactivce Redis
+   - Annotated Controller (WebFlux)
