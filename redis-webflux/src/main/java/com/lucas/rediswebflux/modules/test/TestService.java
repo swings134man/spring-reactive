@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.ReactiveServerCommands;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class TestService {
 
     private final ReactiveStringRedisTemplate redisTemplate;
     private final ReactiveRedisTemplate<String, Object> objectTemplate;
+    private final ReactiveServerCommands redisServerCommands;
     private final ObjectMapper objectMapper;
 
     public Mono<Boolean> saveString(String key, String value) {
@@ -33,8 +35,7 @@ public class TestService {
 
     public Mono<Boolean> saveObj(String key, String value) throws JsonProcessingException {
         log.info("saveObj = {}:{}", key, value);
-        String stringRes = objectMapper.writeValueAsString(value);
-        return objectTemplate.opsForValue().set(key, stringRes);
+        return objectTemplate.opsForValue().set(key, value);
     }
 
     public Mono<String> getObjToString(String key) {
@@ -46,8 +47,7 @@ public class TestService {
     }
 
     public Mono<String> flushAll() {
-        return redisTemplate.getConnectionFactory().getReactiveConnection()
-                .serverCommands().flushAll()
+        return redisServerCommands.flushAll()
                 .doOnSuccess(s -> log.info("Flush All"));
     }
 }

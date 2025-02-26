@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.connection.ReactiveServerCommands;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -51,4 +52,8 @@ public class RedisConfig {
         return new ReactiveStringRedisTemplate(factory);
     }
 
+    @Bean
+    public ReactiveServerCommands redisServerCommands(ReactiveRedisConnectionFactory factory) {
+        return factory.getReactiveConnection().serverCommands();
+    }
 }
