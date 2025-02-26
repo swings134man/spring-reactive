@@ -44,4 +44,10 @@ public class TestService {
                 .doOnNext(value -> log.info("getByObjKey = {}:{}", key, value))
                 .defaultIfEmpty("Empty");
     }
+
+    public Mono<String> flushAll() {
+        return redisTemplate.getConnectionFactory().getReactiveConnection()
+                .serverCommands().flushAll()
+                .doOnSuccess(s -> log.info("Flush All"));
+    }
 }

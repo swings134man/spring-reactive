@@ -39,4 +39,11 @@ public class TestController {
         return service.getObjToString(key)
                 .map(data -> ResponseEntity.ok().body(data));
     }
+
+
+    @GetMapping("/flush")
+    public Mono<ResponseEntity<String>> flushAll() {
+        return service.flushAll()
+                .map(data -> ResponseEntity.ok().body(data));
+    }
 }
