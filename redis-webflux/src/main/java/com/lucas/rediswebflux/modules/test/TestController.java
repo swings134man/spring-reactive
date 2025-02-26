@@ -1,5 +1,6 @@
 package com.lucas.rediswebflux.modules.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,16 @@ public class TestController {
                 .map(data -> ResponseEntity.ok().body(data));
     }
 
-//    @GetMapping("/obj/{key}")
-//    public Mono<ResponseEntity<String>> getByKeyObjString(@PathVariable("key") String key) {
-//        return service.getObjToString(key)
-//                .map(data -> ResponseEntity.ok().body(data));
-//    }
+    // ---------------------------- Object ----------------------------
+    @PostMapping("/obj")
+    public Mono<ResponseEntity<Boolean>> saveObj(@RequestBody KeyValueDto dto) throws JsonProcessingException {
+        return service.saveObj(dto.getKey(), dto.getValue())
+                .map(data -> ResponseEntity.ok().body(data));
+    }
+
+    @GetMapping("/obj/{key}")
+    public Mono<ResponseEntity<String>> getByKeyObjString(@PathVariable("key") String key) {
+        return service.getObjToString(key)
+                .map(data -> ResponseEntity.ok().body(data));
+    }
 }

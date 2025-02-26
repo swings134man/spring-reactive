@@ -1,8 +1,11 @@
 package com.lucas.rediswebflux.modules.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -11,9 +14,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class TestService {
 
-    private final ReactiveRedisTemplate<String, String> redisTemplate;
-
+    private final ReactiveStringRedisTemplate redisTemplate;
     private final ReactiveRedisTemplate<String, Object> objectTemplate;
+    private final ObjectMapper objectMapper;
 
     public Mono<Boolean> saveString(String key, String value) {
         log.info("saveString = {}:{}", key, value);
@@ -25,11 +28,20 @@ public class TestService {
                 .doOnNext(value -> log.info("getByKey = {}:{}", key, value));
     }
 
-//    public Mono<Object> getObjToString(String key) {
-//        return objectTemplate.opsForValue().get(key)
-////                .cast(String.class) // value 가 String 이 아닐경우 Exception
-////                .map(Object::toString)
-//                .doOnNext(value -> log.info("getByObjKey = {}:{}", key, value))
-//                .defaultIfEmpty("Empty");
-//    }
+
+    // ---------------------------- Object ----------------------------
+
+    public Mono<Boolean> saveObj(String key, String value) throws JsonProcessingException {
+        log.info("saveObj = {}:{}", key, value);
+        String stringRes = objectMapper.writeValueAsString(value);
+        return objectTemplate.opsForValue().set(key, stringRes);
+    }
+
+    public Mono<String> getObjToString(String key) {
+        return objectTemplate.opsForValue().get(key)
+//                .cast(String.class) // value 가 String 이 아닐경우 Exception
+                .map(Object::toString)
+                .doOnNext(value -> log.info("getByObjKey = {}:{}", key, value))
+                .defaultIfEmpty("Empty");
+    }
 }
