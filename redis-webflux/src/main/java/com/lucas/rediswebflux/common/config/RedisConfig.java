@@ -3,6 +3,7 @@ package com.lucas.rediswebflux.common.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.ReactiveKeyCommands;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.connection.ReactiveServerCommands;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -55,5 +56,10 @@ public class RedisConfig {
     @Bean
     public ReactiveServerCommands redisServerCommands(ReactiveRedisConnectionFactory factory) {
         return factory.getReactiveConnection().serverCommands();
+    }
+
+    @Bean
+    public ReactiveKeyCommands redisKeyCommands(ReactiveRedisConnectionFactory factory) {
+        return factory.getReactiveConnection().keyCommands();
     }
 }

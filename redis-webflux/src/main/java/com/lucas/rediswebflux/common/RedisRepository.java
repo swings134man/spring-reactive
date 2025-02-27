@@ -3,6 +3,7 @@ package com.lucas.rediswebflux.common;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.connection.ReactiveKeyCommands;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class RedisRepository {
 
     private final ReactiveRedisTemplate<String, Object> objTemplate;
     private final ReactiveStringRedisTemplate stringTemplate;
+    private final ReactiveKeyCommands keyCommands;
     private final ObjectMapper mapper;
 
     /**
@@ -84,7 +86,7 @@ public class RedisRepository {
      * @return
      * @param <T>
      */
-    public <T> Mono<List<T>> getList(String key, Class<T> type) {
+    public <T> Mono<List<T>> getList(String key, TypeReference<List<T>> type) {
         return objTemplate.opsForValue().get(key)
                 .map(data -> mapper.convertValue(data, new TypeReference<List<T>>() {}))
                 .defaultIfEmpty(Collections.emptyList());
