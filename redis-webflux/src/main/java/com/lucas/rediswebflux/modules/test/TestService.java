@@ -10,6 +10,14 @@ import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/**
+ * @package : com.lucas.rediswebflux.modules.test
+ * @name : TestService.java
+ * @date : 2025. 2. 27. 오후 3:58
+ * @author : lucaskang(swings134man)
+ * @Description: Redis Template 사용 Test Service Class
+ * ADD: 공통 Util Class(RedisRepository) 로 변경 이후로는 더 간단하게 사용 가능함.
+**/
 @Service
 @RequiredArgsConstructor
 @Slf4j
