@@ -40,6 +40,18 @@ public class TestController {
                 .map(data -> ResponseEntity.ok().body(data));
     }
 
+    @PostMapping("/dto")
+    public Mono<ResponseEntity<Boolean>> saveObj(@RequestBody TestObjDTO dto) {
+        return service.saveObj(dto)
+                .map(data -> ResponseEntity.ok().body(data));
+    }
+
+    @GetMapping("/dto/{id}")
+    public Mono<ResponseEntity<TestObjDTO>> getObjDto(@PathVariable("id") Long id) {
+        return service.getObjDto(id)
+                .map(data -> ResponseEntity.ok().body(data));
+    }
+
 
     @GetMapping("/flush")
     public Mono<ResponseEntity<String>> flushAll() {

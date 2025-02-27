@@ -20,6 +20,8 @@ public class TestService {
     private final ReactiveServerCommands redisServerCommands;
     private final ObjectMapper objectMapper;
 
+    private static final String KEY = "dto:";
+
     public Mono<Boolean> saveString(String key, String value) {
         log.info("saveString = {}:{}", key, value);
         return redisTemplate.opsForValue().set(key, value);
@@ -44,6 +46,20 @@ public class TestService {
                 .map(Object::toString)
                 .doOnNext(value -> log.info("getByObjKey = {}:{}", key, value))
                 .defaultIfEmpty("Empty");
+    }
+
+    // Get Request 경우 getObjToString 도 사용가능(String)
+    public Mono<Boolean> saveObj(TestObjDTO dto) {
+        log.info("saveObj = {}", dto);
+        return objectTemplate.opsForValue().set(KEY + dto.getId(), dto);
+    }
+
+    public Mono<TestObjDTO> getObjDto(Long id) {
+        String dtoKey = KEY + id;
+        return objectTemplate.opsForValue().get(dtoKey)
+                .map(data -> objectMapper.convertValue(data, TestObjDTO.class))
+                .doOnNext(dto -> log.info("getObjDto = {}", dto))
+                .defaultIfEmpty(new TestObjDTO());
     }
 
     public Mono<String> flushAll() {
