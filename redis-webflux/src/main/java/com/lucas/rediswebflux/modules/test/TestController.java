@@ -1,6 +1,8 @@
 package com.lucas.rediswebflux.modules.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.lucas.rediswebflux.modules.test.entity.KeyValueDto;
+import com.lucas.rediswebflux.modules.test.entity.TestObjDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

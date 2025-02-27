@@ -1,4 +1,4 @@
-package com.lucas.rediswebflux.modules.test;
+package com.lucas.rediswebflux.modules.test.entity;
 
 import lombok.Data;
 
