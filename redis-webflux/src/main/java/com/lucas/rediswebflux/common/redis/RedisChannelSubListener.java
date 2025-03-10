@@ -8,23 +8,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RedisChannelSubListener implements MessageListener {
 
-    private final RedisTemplate<String, Object> template;
+    private final ReactiveRedisTemplate<String, Object> template;
     private final ObjectMapper mapper;
-    private final ChannelService channelService;
+//    private final ChannelService channelService;
 
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        String msg = template.getStringSerializer().deserialize(message.getBody());
-//        String channel = template.getStringSerializer().deserialize(message.getChannel()); // Redis Channel info
+        String msg = new String(message.getBody(), StandardCharsets.UTF_8);
 
         try {
             ChannelDto channelDto = mapper.readValue(msg, ChannelDto.class);

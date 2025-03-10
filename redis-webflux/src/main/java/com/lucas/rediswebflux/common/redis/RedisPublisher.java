@@ -3,7 +3,7 @@ package com.lucas.rediswebflux.common.redis;
 import com.lucas.rediswebflux.modules.channel.domain.ChannelDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RedisPublisher {
 
-    private final RedisTemplate<String, Object> template;
-
-    public RedisPublisher(RedisTemplate<String, Object> template) {
-        this.template = template;
-    }
-
+    private final ReactiveRedisTemplate<String, Object> template;
 
     /**
      * Object publish

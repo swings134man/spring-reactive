@@ -6,10 +6,12 @@ import com.lucas.rediswebflux.modules.channel.domain.ChannelDto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ChannelService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final ReactiveRedisTemplate<String, Object> redisTemplate;
     private final RedisMessageListenerContainer container;
     private final RedisPublisher publisher;
     private final RedisChannelSubListener listener;
@@ -37,9 +39,9 @@ public class ChannelService {
     **/
     @PostConstruct
     public void initTopicsFromRedis() {
-        Map<Object, Object> chatRooms = redisTemplate.opsForHash().entries(CHANNEL_PREFIX);
+        Flux<Map.Entry<Object, Object>> entries = redisTemplate.opsForHash().entries(CHANNEL_PREFIX);
 
-        for (Object key : chatRooms.keySet()) {
+        for (Object key : entries.toIterable()) {
             String channelId = (String) key;
             ChannelTopic topic = new ChannelTopic(channelId);
             topics.put(channelId, topic);
@@ -67,14 +69,21 @@ public class ChannelService {
 
 
 
-    public void newChannel(String channelId) {
+    public Mono<String> newChannel(String channelId) {
         ChannelTopic channelTopic = topics.get(channelId);
         if(channelTopic == null) {
             channelTopic = new ChannelTopic(channelId);
             container.addMessageListener(listener, channelTopic);
             topics.put(channelId, channelTopic);
+            log.info("New Channel Created: {}", channelId);
         }
-        log.info("New Channel Created: {}", channelId);
+        return Mono.just(channelId);
+    }
+
+    public Mono<String> createChannelByName(String channelName) {
+        String channelId = UUID.randomUUID().toString();
+        return redisTemplate.opsForHash().put(CHANNEL_PREFIX, channelId, channelName)
+                .then(newChannel(channelId));
     }
 
 
