@@ -21,8 +21,22 @@
 > 3. Subscriber 가 해당 Channel 을 구독하고, 메시지를 받음 (MessageListener)
 > #### Client
 > 4. 특정 Channel 을 SSE 로 구독하여, 메시지를 받음
+> ---
+> ### To Another Server(8081, redis-consume-flux module)
+> - Redis 에 Topic 생성
+> - Server 기동시 기존 Topic -> channel Topic 으로 생성
+> - Client(Test Case) 로 프로토콜에 맞춰 메시지 발행
+> - Redis Topic 에 pub
+> - 8081 모듈은 Subscriber 이기에 해당 메시지 받아서 처리가능.
 
+---
+```bash
+redis-cli
 
+heys {key}
+subscribe {channel} # 구독
+pubilsh {channel} {message} # 발행
+```
 
 
 

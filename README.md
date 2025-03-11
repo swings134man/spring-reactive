@@ -24,3 +24,6 @@ GitHub Repo Renamed at 2024-10-07 [netty -> spring-reactive]
 6. redis-webflux Webflux 에서 Reactive Redis 연동 모듈
    - Reactivce Redis
    - Annotated Controller (WebFlux)
+7. redis-consume-flux : redis-webflux 에서 Redis Pub/Sub 을 이용한 데이터 소비 모듈
+   - Reactivce Redis
+   - Annotated Controller (WebFlux)

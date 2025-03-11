@@ -1,12 +1,10 @@
 package com.lucas.rediswebflux.modules.channel;
 
+import com.lucas.rediswebflux.modules.channel.domain.ChannelDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -21,5 +19,10 @@ public class ChannelController {
     public Mono<ResponseEntity<String>> createChannel(@PathVariable String channelName) {
         return channelService.createChannelByName(channelName)
                 .map(data -> ResponseEntity.ok().body(data));
+    }
+
+    @PostMapping("/flux/pub")
+    public void sendMsg(@RequestBody ChannelDto dto) {
+        channelService.pushMsg(dto.getChannelId() ,dto);
     }
 }

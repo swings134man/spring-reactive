@@ -10,13 +10,20 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @package : com.lucas.rediswebflux.modules.channel
+ * @name : ChannelService.java
+ * @date : 2025. 3. 11. 오후 6:04
+ * @author : lucaskang(swings134man)
+ * @Description: Redis Topic 생성 및, 메시지 전송 Service
+ * - MSg 전송의 경우, Client 에서 정의된 프로토콜 타입을 받아 실행됨.(ChannelDTO)
+**/
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -39,15 +46,15 @@ public class ChannelService {
     **/
     @PostConstruct
     public void initTopicsFromRedis() {
-        Flux<Map.Entry<Object, Object>> entries = redisTemplate.opsForHash().entries(CHANNEL_PREFIX);
-
-        for (Object key : entries.toIterable()) {
-            String channelId = (String) key;
-            ChannelTopic topic = new ChannelTopic(channelId);
-            topics.put(channelId, topic);
-            container.addMessageListener(listener, topic);
-            log.info("🔄 Redis Channel Recovery: {}", channelId);
-        }
+        redisTemplate.opsForHash().entries(CHANNEL_PREFIX)
+                .doOnNext(entry -> {
+                    String channelId = (String) entry.getKey();
+                    ChannelTopic topic = new ChannelTopic(channelId);
+                    topics.put(channelId, topic);
+                    container.addMessageListener(listener, topic);
+                    log.info("🔄 Redis Channel Recovery: {}", channelId);
+                })
+                .blockLast();
     }
 
     /**
@@ -63,7 +70,7 @@ public class ChannelService {
             log.error("Channel Not Found: {}", channelId);
             // TODO: Exception 처리
         }else {
-            publisher.publish(channelTopic, message);
+            publisher.publish(channelTopic, message).subscribe();
         }
     }// msg send
 
@@ -82,9 +89,14 @@ public class ChannelService {
 
     public Mono<String> createChannelByName(String channelName) {
         String channelId = UUID.randomUUID().toString();
+        ChannelTopic topic = new ChannelTopic(channelId); // ChannelTopic 생성
+        topics.put(channelId, topic);  // topics 저장
         return redisTemplate.opsForHash().put(CHANNEL_PREFIX, channelId, channelName)
-                .then(newChannel(channelId));
+                .then(Mono.just(channelId));
     }
 
+    public void findChannel(String channelId) {
+        redisTemplate.opsForHash().get(CHANNEL_PREFIX, channelId);
+    }
 
 }
