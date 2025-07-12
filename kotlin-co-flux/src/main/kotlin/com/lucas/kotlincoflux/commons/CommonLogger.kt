@@ -1,4 +1,4 @@
-package com.lucas.kotlincoflux.configs
+package com.lucas.kotlincoflux.commons
 
 import org.slf4j.LoggerFactory
 import kotlin.jvm.java
