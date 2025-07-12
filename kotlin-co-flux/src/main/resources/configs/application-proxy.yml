@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: proxy
+
+  # DB Schema 는 Test 용 Schema
+  r2dbc:
+    url: r2dbc:postgresql://192.168.45.135:5432/test_jpa
+    username: test
+    password: testuser1234
+
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    root: info

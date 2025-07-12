@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: kotlin-co-flux
+
+  profiles:
+    active: proxy
+
+  config:
+    import:
+      - classpath:/configs/application-proxy.yml
