@@ -10,5 +10,5 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository
  * @since: 2025. 7. 13. 오전 1:43
  * @description:
  */
-interface BoardRepository : R2dbcRepository<Board, Long> {
+interface BoardRepository : R2dbcRepository<Board, Long>, BoardCustomRepository {
 }

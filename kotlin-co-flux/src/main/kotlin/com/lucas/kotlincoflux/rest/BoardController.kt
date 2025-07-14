@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -21,7 +22,6 @@ class BoardController(
 
     @PostMapping("/")
     suspend fun createBoard(@RequestBody board: Board): ResponseEntity<Board> {
-        // Logic to create a new board
         val createdBoard = boardService.save(board)
         return ResponseEntity.ok(createdBoard)
     }
@@ -46,6 +46,17 @@ class BoardController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     suspend fun deleteBoard(@PathVariable id: Long) {
         boardService.deleteBoard(id)
+    }
+
+
+    // ------------------------------------------ Custom Query Methods ------------------------------------------
+    @GetMapping("/date-range")
+    suspend fun getBoardsByDateRange(
+        @RequestParam startDate: String,
+        @RequestParam endDate: String
+    ): ResponseEntity<List<Board>> {
+        val boards = boardService.findByBoardDateRange(startDate, endDate)
+        return ResponseEntity.ok(boards)
     }
 
 }

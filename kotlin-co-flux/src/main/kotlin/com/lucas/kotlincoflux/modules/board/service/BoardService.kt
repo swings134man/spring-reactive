@@ -3,10 +3,12 @@ package com.lucas.kotlincoflux.modules.board.service
 import com.lucas.kotlincoflux.commons.logger
 import com.lucas.kotlincoflux.modules.board.model.Board
 import com.lucas.kotlincoflux.modules.board.repository.BoardRepository
+import com.lucas.kotlincoflux.utils.toLocalDateTime
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 /**
  * BoardService.kt:
@@ -65,5 +67,16 @@ class BoardService(
         } else {
             throw IllegalArgumentException("Board with id $id not found")
         }
+    }
+
+    // ------------------------------------------ Custom Query Methods ------------------------------------------
+    /**
+     * @author: lucaskang(swings134man)
+     * @since: 2025. 7. 15. 오전 1:58
+     * @description: 게시글 생성일을 기준으로, 특정 날짜 범위에 해당하는 게시글을 조회하는 메서드
+     */
+    @Transactional(readOnly = true)
+    suspend fun findByBoardDateRange(startDate: String, endDate: String): List<Board> {
+        return boardRepository.findByBoardDateRange(startDate.toLocalDateTime(), endDate.toLocalDateTime())
     }
 }// class
