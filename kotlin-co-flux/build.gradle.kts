@@ -28,15 +28,22 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.6") // swagger-ui
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
+	// DB
 	implementation("org.postgresql:r2dbc-postgresql")
-	runtimeOnly("io.r2dbc:r2dbc-postgresql") // R2DBC 드라이버
+	runtimeOnly("io.r2dbc:r2dbc-postgresql")
+	implementation("io.r2dbc:r2dbc-h2") // Test H2 DB
+
+	// Runtime
 	runtimeOnly ("io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64") // Netty Dns Resolver For ARM Mac Error
 
-
+	// Test dependencies
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+	testImplementation("io.kotest:kotest-runner-junit5:5.8.0") // kotest
+	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2") // kotest-extensions
+	testImplementation("io.mockk:mockk:1.13.8") // MockK
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

@@ -15,4 +15,7 @@ spring:
 
 logging:
   level:
-    root: info
+    org.springframework.r2dbc.core: DEBUG # For R2DBC SQL Query
+#    io.r2dbc.postgresql.PARAM: DEBUG # Parameter 별도 확인 필요시 사용
+#    io.r2dbc.postgresql.QUERY: DEBUG # 사용되는 모든 쿼리확인 용도
+    root: INFO
