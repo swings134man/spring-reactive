@@ -29,8 +29,8 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 	// DB
-	implementation("org.postgresql:r2dbc-postgresql")
-	runtimeOnly("io.r2dbc:r2dbc-postgresql")
+	implementation("org.postgresql:r2dbc-postgresql:1.0.3.RELEASE")
+//	runtimeOnly("io.r2dbc:r2dbc-postgresql:0.8.11.RELEASE") // 위와 같은 버전
 	implementation("io.r2dbc:r2dbc-h2") // Test H2 DB
 
 	// Runtime
