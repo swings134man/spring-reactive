@@ -4,6 +4,7 @@ import com.lucas.kotlincoflux.modules.board.model.Board
 import org.springframework.r2dbc.core.DatabaseClient
 import java.time.LocalDateTime
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import org.springframework.stereotype.Repository
 
 /**
  * BoardRepositoryImpl.kt: BoardCustomRepository 구현 클래스 (Implementation Class)
@@ -12,6 +13,7 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
  * @since: 2025. 7. 15. 오전 1:38
  * @description:
  */
+@Repository
 class BoardRepositoryImpl(
     private val client: DatabaseClient
 ): BoardCustomRepository {

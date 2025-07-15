@@ -27,6 +27,32 @@ class BoardServiceTest(
         }
     }
 
+    given("board create - Rollback Test") {
+        When("중간에 예외가 나면") {
+            then("데이터는 롤백되어야 한다") {
+
+                println("두 번째 테스트 시작 전 게시글 수: ${boardService.getAllBoards().size}")
+
+                try {
+                    val board = Board(
+                        title = "제목입니다1",
+                        content = "내용입니다1"
+                    )
+
+                    boardRepository.save(board)
+                    println("예외 발생 전 게시글 수: ${boardService.getAllBoards().size}")
+
+                    throw RuntimeException("강제 예외")
+
+                } catch (_: Exception) {
+                    val results = boardService.getAllBoards()
+                    println("예외 발생 후 게시글 수: ${results.size}")
+                    results.size shouldBe 0
+                }
+            }
+        }
+    }
+
 
     given("board create - Success Test") {
         When("새로운 게시글을 작성하면") {
@@ -51,30 +77,5 @@ class BoardServiceTest(
     }
 
 
-//    given("board create - Rollback Test") {
-//        When("중간에 예외가 나면") {
-//            then("데이터는 롤백되어야 한다") {
-//
-//                println("두 번째 테스트 시작 전 게시글 수: ${boardService.getAllBoards().size}")
-//
-//                try {
-//                    val board = Board(
-//                        title = "제목입니다1",
-//                        content = "내용입니다1"
-//                    )
-//
-//                    boardRepository.save(board)
-//                    println("예외 발생 전 게시글 수: ${boardService.getAllBoards().size}")
-//
-//                    throw RuntimeException("강제 예외")
-//
-//                } catch (_: Exception) {
-//                    val results = boardService.getAllBoards()
-//                    println("예외 발생 후 게시글 수: ${results.size}")
-//                    results.size shouldBe 0
-//                }
-//            }
-//        }
-//    }
 
 })
