@@ -40,7 +40,8 @@ class BoardRepositoryImpl(
                 Board(
                     id = row.get("id", Long::class.java),
                     title = row.get("title", String::class.java) ?: "",
-                    content = row.get("content", String::class.java) ?: ""
+                    content = row.get("content", String::class.java) ?: "",
+                    korId = row.get("kor_id", Long::class.java)
                 ).apply {
                     createdAt = row.get("created_at", LocalDateTime::class.java)
                     updatedAt = row.get("updated_at", LocalDateTime::class.java)

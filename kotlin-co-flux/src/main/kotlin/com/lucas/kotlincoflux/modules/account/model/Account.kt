@@ -1,5 +1,7 @@
 package com.lucas.kotlincoflux.modules.account.model
 
+import com.lucas.kotlincoflux.commons.BaseField
+import com.lucas.kotlincoflux.modules.board.model.Board
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
@@ -18,4 +20,7 @@ data class Account(
     var name: String,
     var age: Int,
     var isActive: Boolean = true,
-)
+
+    @Transient
+    var boards: List<Board>? = null
+): BaseField()
