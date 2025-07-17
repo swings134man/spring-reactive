@@ -1,5 +1,6 @@
 package com.lucas.kotlincoflux.modules.join.service
 
+import com.lucas.kotlincoflux.modules.account.model.Account
 import com.lucas.kotlincoflux.modules.account.service.AccountService
 import com.lucas.kotlincoflux.modules.board.model.Board
 import com.lucas.kotlincoflux.modules.board.service.BoardService
@@ -21,6 +22,9 @@ class JoinService(
     private val joinRepository: JoinRepository
 ) {
 
+
+    // ------------------------------------------------ OneToMany ------------------------------------------------
+
     // Board 기반조회 (N) Account (1) - 각각조회후 수동 set
     @Transactional(readOnly = true)
     suspend fun findByBoardWithAccount(boardId: Long): Board? {
@@ -37,5 +41,16 @@ class JoinService(
         return joinRepository.findByBoardsWithAccount()
     }
 
+    // ------------------------------------------------ ManyToOne ------------------------------------------------
+
+    // Account 기반 조회 (1) Board (N) - ManyToOne : 각각조회 후 수동 set
+    @Transactional(readOnly = true)
+    suspend fun findByAccountWithBoards(accountId: Long): Account? {
+        val account = accountService.getAccountById(accountId) ?: return null // Account 조회
+        val boards = account.let { boardService.getBoardsByKorId(accountId) }  // Account 의 korId 로 Board 조회
+        account.boards = boards // Account 의 boards(@Transient) 필드에 Board 리스트 설정
+
+        return account
+    }
 
 }

@@ -13,7 +13,7 @@ class JoinRepositoryImpl(
 ): JoinRepository {
 
 
-    // Board All 조회 + Account JOIN
+    // Board All 조회 + Account JOIN : OneToMany
     override suspend fun findByBoardsWithAccount(): List<Board> {
         return client.sql(
             """

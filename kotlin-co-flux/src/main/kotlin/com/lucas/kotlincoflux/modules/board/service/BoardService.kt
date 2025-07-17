@@ -79,4 +79,9 @@ class BoardService(
     suspend fun findByBoardDateRange(startDate: String, endDate: String): List<Board> {
         return boardRepository.findByBoardDateRange(startDate.toLocalDateTime(), endDate.toLocalDateTime())
     }
+
+    @Transactional(readOnly = true)
+    suspend fun getBoardsByKorId(korId: Long): List<Board>? {
+        return boardRepository.findByKorId(korId)
+    }
 }// class

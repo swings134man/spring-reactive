@@ -1,5 +1,6 @@
 package com.lucas.kotlincoflux.rest
 
+import com.lucas.kotlincoflux.modules.account.model.Account
 import com.lucas.kotlincoflux.modules.board.model.Board
 import com.lucas.kotlincoflux.modules.join.service.JoinService
 import org.springframework.http.ResponseEntity
@@ -29,6 +30,16 @@ class JoinController(
     suspend fun getAllBoardsWithAccounts(): ResponseEntity<List<Board>> {
         val result = joinService.findAllBoardsWithAccounts()
         return ResponseEntity.ok(result)
+    }
+
+    // ------------------------------------------------ ManyToOne ------------------------------------------------
+    // account 기반 조회 - Board (N)
+    @GetMapping("/account/{id}")
+    suspend fun getAccountWithBoards(@PathVariable id: Long): ResponseEntity<Account?> {
+        val result = joinService.findByAccountWithBoards(id)
+
+        return if(result != null) ResponseEntity.ok(result)
+        else ResponseEntity.notFound().build()
     }
 
 
