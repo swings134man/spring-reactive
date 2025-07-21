@@ -16,7 +16,7 @@ class JoinController(
 ) {
 
 
-    // board 조회 - 각각 조회후 조합
+    // board 조회 - 각각 조회후 조합 : ManyToOne
     @GetMapping("/board-ac/{id}")
     suspend fun getBoardWithAccountById(@PathVariable id: Long): ResponseEntity<Board> {
         val result = joinService.findByBoardWithAccount(id)
@@ -32,7 +32,7 @@ class JoinController(
         return ResponseEntity.ok(result)
     }
 
-    // ------------------------------------------------ ManyToOne ------------------------------------------------
+    // ------------------------------------------------ OneToMany ------------------------------------------------
     // account 기반 조회 - Board (N)
     @GetMapping("/account/{id}")
     suspend fun getAccountWithBoards(@PathVariable id: Long): ResponseEntity<Account?> {

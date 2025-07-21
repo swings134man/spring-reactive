@@ -43,7 +43,7 @@ class JoinService(
 
     // ------------------------------------------------ ManyToOne ------------------------------------------------
 
-    // Account 기반 조회 (1) Board (N) - ManyToOne : 각각조회 후 수동 set
+    // Account 기반 조회 (1) Board (N) - OneToMany : 각각조회 후 수동 set
     @Transactional(readOnly = true)
     suspend fun findByAccountWithBoards(accountId: Long): Account? {
         val account = accountService.getAccountById(accountId) ?: return null // Account 조회
